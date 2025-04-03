@@ -14,8 +14,18 @@ def extrair_tabela(pdf_path):
     
     return dados
 
+def substituir_abreviacoes(df):
+    legenda = {
+        "OD": "Odontologia",
+        "AMB": "Ambulatorial"
+    }
+    
+    df.replace(legenda, inplace=True)
+    return df
+
 def salvar_csv(dados, nome_csv):
     df = pd.DataFrame(dados)
+    df = substituir_abreviacoes(df)
     df.to_csv(nome_csv, index=False, encoding='utf-8')
     print(f"Arquivo salvo: {nome_csv}")
 
@@ -25,10 +35,9 @@ def compactar_csv(nome_csv, nome_zip):
     print(f"Compactado em: {nome_zip}")
 
 def main():
-    pdf_path = "webScrapping/downloads/Anexo_I_Rol_2021RN_465.2021_RN627L.2024.pdf" #precisa ser o caminho correto do arquivo PDF
-    # pdf_path = "downloads/Anexo_II.pdf" # tenho que arrumar uma maneira de pegar o nome do arquivo para não usar o nome fixo
-    nome_csv = "Rol_de_Procedimentos.csv"
-    nome_zip = "anexos.zip"
+    pdf_path = "../webScrapping/downloads/Anexo_I_Rol_2021RN_465.2021_RN627L.2024.pdf"
+    nome_csv = "rol_de_Procedimentos.csv"
+    nome_zip = "Teste_Stevan.zip"
     
     dados = extrair_tabela(pdf_path)
     salvar_csv(dados, nome_csv)
