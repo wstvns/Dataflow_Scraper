@@ -1,4 +1,4 @@
--- Cria tabela dos dados do anexo 1
+-- Criar tabela rol_procedimentos
 CREATE TABLE rol_procedimentos (
     id SERIAL PRIMARY KEY,
     codigo VARCHAR(50),
@@ -7,10 +7,10 @@ CREATE TABLE rol_procedimentos (
     ambulatorial BOOLEAN
 );
 
--- Cria tabela dos dados das operadoras
+-- Criar tabela operadoras
 CREATE TABLE operadoras (
     id SERIAL PRIMARY KEY,
-    registro_ans VARCHAR(50),
+    registro_ans VARCHAR(50) UNIQUE,
     cnpj VARCHAR(20),
     razao_social TEXT,
     modalidade VARCHAR(50),
@@ -18,46 +18,47 @@ CREATE TABLE operadoras (
     data_registro DATE
 );
 
--- Cria tabela para armazenamento contabil
+-- Criar tabela demonstracoes_contabeis
 CREATE TABLE demonstracoes_contabeis (
     id SERIAL PRIMARY KEY,
-    registro_ans VARCHAR(50),
-    ano INT,
-    trimestre INT,
-    evento_sinistros NUMERIC(18,2)
+    registro_ans VARCHAR(50) REFERENCES operadoras(registro_ans),
+    ano INT NOT NULL,
+    trimestre INT NOT NULL,
+    evento_sinistros NUMERIC(18,2) CHECK (evento_sinistros >= 0)
 );
 
--- Importa dados para a tabela do rol de procedimentos
+-- Importação corrigida para cada arquivo específico
 COPY rol_procedimentos(codigo, descricao, odontologia, ambulatorial)
-FROM 'database/data/Relatorio_cadop.csv'
+FROM 'database/data/Rol_de_Procedimentos.csv'
 DELIMITER ','
 CSV HEADER ENCODING 'UTF8';
 
--- Importar dados para a tabela operadoras
 COPY operadoras(registro_ans, cnpj, razao_social, modalidade, uf, data_registro)
-FROM 'database/data/Relatorio_cadop.csv'
+FROM 'database/data/Operadoras_Ativas.csv'
 DELIMITER ','
 CSV HEADER ENCODING 'UTF8';
 
--- Importar dados para a tabela demonstracoes contabeis
 COPY demonstracoes_contabeis(registro_ans, ano, trimestre, evento_sinistros)
-FROM 'database/data/Relatorio_cadop.csv'
+FROM 'database/data/Demonstracoes_Contabeis.csv'
 DELIMITER ','
 CSV HEADER ENCODING 'UTF8';
 
--- Query das 10 oepradoras com maiores despesas em sinistros
+-- 10 operadoras com maiores despesas no último trimestre disponível
 SELECT registro_ans, SUM(evento_sinistros) AS total_despesas
 FROM demonstracoes_contabeis
-WHERE ano = EXTRACT(YEAR FROM CURRENT_DATE) 
-AND trimestre = (SELECT MAX(trimestre) FROM demonstracoes_contabeis WHERE ano = EXTRACT(YEAR FROM CURRENT_DATE))
+WHERE (ano, trimestre) = (
+    SELECT ano, MAX(trimestre)
+    FROM demonstracoes_contabeis
+    WHERE ano = (SELECT MAX(ano) FROM demonstracoes_contabeis)
+)
 GROUP BY registro_ans
 ORDER BY total_despesas DESC
 LIMIT 10;
 
--- Query do ultimo ano
+-- 10 operadoras com maiores despesas no último ano
 SELECT registro_ans, SUM(evento_sinistros) AS total_despesas
 FROM demonstracoes_contabeis
-WHERE ano = EXTRACT(YEAR FROM CURRENT_DATE) - 1
+WHERE ano = (SELECT MAX(ano) FROM demonstracoes_contabeis)
 GROUP BY registro_ans
 ORDER BY total_despesas DESC
 LIMIT 10;
