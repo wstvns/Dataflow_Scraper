@@ -35,7 +35,7 @@ def compactar_csv(nome_csv, nome_zip):
     print(f"Compactado em: {nome_zip}")
 
 def main():
-    pdf_path = "../webScrapping/downloads/Anexo_I_Rol_2021RN_465.2021_RN627L.2024.pdf"
+    pdf_path = "../webScraping/downloads/Anexo_I_Rol_2021RN_465.2021_RN627L.2024.pdf"
     nome_csv = "rol_de_Procedimentos.csv"
     nome_zip = "Teste_Stevan.zip"
     
