@@ -34,7 +34,7 @@ DELIMITER ','
 CSV HEADER ENCODING 'UTF8';
 
 COPY operadoras(registro_ans, cnpj, razao_social, modalidade, uf, data_registro)
-FROM 'database/data/Operadoras_Ativas.csv'
+FROM 'database/data/Relatorio_cadop.csv'
 DELIMITER ','
 CSV HEADER ENCODING 'UTF8';
 

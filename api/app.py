@@ -1,11 +1,17 @@
 # teste de api
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import pandas as pd
+import os
 
 app = Flask(__name__)
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+CORS(app)
+
 def carregar_operadoras():
-    df = pd.read_csv("Operadoras_Ativas.csv", encoding="utf-8")
+    df = pd.read_csv("Relatorio_cadop.csv", encoding="utf-8")
     return df
 
 @app.route("/buscar_operadora", methods=["GET"])
